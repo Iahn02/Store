@@ -1,0 +1,111 @@
+---
+// src/components/Footer.astro
+---
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <span class="footer-logo">✦ Mi Tienda</span>
+      <p class="footer-tagline">Muebles, joyería y decoración con diseño exclusivo.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Categorías</h4>
+        <a href="/categorias/muebles">Muebles</a>
+        <a href="/categorias/joyeria">Joyería</a>
+        <a href="/categorias/decoracion">Decoración</a>
+        <a href="/categorias/decoracion/lamparas">Lámparas</a>
+        <a href="/categorias/decoracion/espejos">Espejos</a>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <a href="#">Nosotros</a>
+        <a href="#">Envíos</a>
+        <a href="#">Contacto</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; {new Date().getFullYear()} Mi Tienda. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: #1a1a1a;
+    color: #ccc;
+    margin-top: 4rem;
+  }
+
+  .footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .footer-tagline {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #888;
+    max-width: 280px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 4rem;
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .footer-col h4 {
+    color: #fff;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .footer-col a {
+    color: #999;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover {
+    color: #d4a373;
+  }
+
+  .footer-bottom {
+    border-top: 1px solid #2a2a2a;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  @media (max-width: 640px) {
+    .footer-container {
+      flex-direction: column;
+    }
+    .footer-links {
+      gap: 2rem;
+    }
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+// src/components/ProductGrid.astro
+// Grid responsive que renderiza una lista de ProductCard.
+
+import type { Product } from '../data/products';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  products: Product[];
+  columns?: number;
+}
+
+const { products, columns = 3 } = Astro.props;
+---
+
+{products.length > 0 ? (
+  <div class="product-grid" style={`--columns: ${columns}`}>
+    {products.map((product) => (
+      <ProductCard product={product} />
+    ))}
+  </div>
+) : (
+  <div class="empty-state">
+    <p>No se encontraron productos en esta categoría.</p>
+    <a href="/categorias" class="empty-link">Ver todas las categorías →</a>
+  </div>
+)}
+
+<style>
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns, 3), 1fr);
+    gap: 2rem;
+  }
+
+  @media (max-width: 1024px) {
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #888;
+  }
+
+  .empty-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #8b5e3c;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .empty-link:hover {
+    text-decoration: underline;
+  }
+</style>
