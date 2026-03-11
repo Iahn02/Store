@@ -1,0 +1,48 @@
+---
+// src/pages/categorias/decoracion/index.astro
+import Layout from '../../../layouts/Layout.astro';
+import ProductGrid from '../../../components/ProductGrid.astro';
+import CategoryMenu from '../../../components/CategoryMenu.astro';
+import { getProducts } from '../../../data/products';
+
+const products = await getProducts('decoracion');
+---
+
+<Layout
+  title="Decoración | Mi Tienda — Lámparas, Espejos y más"
+  description="Elementos decorativos que transforman tu espacio. Lámparas, espejos y accesorios con diseño exclusivo."
+>
+  <main class="container section">
+    <h1 class="section-title">Decoración</h1>
+    <p class="section-subtitle">Elementos decorativos que transforman cualquier espacio.</p>
+
+    <div class="catalog-layout">
+      <CategoryMenu activeCategory="decoracion" />
+      <div class="catalog-main">
+        <p class="results-count">{products.length} productos</p>
+        <ProductGrid products={products} />
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .results-count {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .catalog-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

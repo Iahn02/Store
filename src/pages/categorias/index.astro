@@ -1,0 +1,48 @@
+---
+// src/pages/categorias/index.astro — Vista general del catálogo
+import Layout from '../../layouts/Layout.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import CategoryMenu from '../../components/CategoryMenu.astro';
+import { getAllProducts } from '../../data/products';
+
+const products = await getAllProducts();
+---
+
+<Layout
+  title="Catálogo Completo | Mi Tienda"
+  description="Explora todo nuestro catálogo de muebles, joyería y decoración."
+>
+  <main class="container section">
+    <h1 class="section-title">Catálogo Completo</h1>
+    <p class="section-subtitle">Explora todos nuestros productos en un solo lugar.</p>
+
+    <div class="catalog-layout">
+      <CategoryMenu />
+      <div class="catalog-main">
+        <p class="results-count">{products.length} productos</p>
+        <ProductGrid products={products} />
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .results-count {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .catalog-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

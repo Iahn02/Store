@@ -1,0 +1,43 @@
+---
+// src/components/SEOHead.astro
+// Componente reutilizable para meta tags dinámicos, Open Graph y Twitter Cards.
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: string;
+  canonicalUrl?: string;
+}
+
+const {
+  title,
+  description,
+  image = '/images/og-default.jpg',
+  type = 'website',
+  canonicalUrl,
+} = Astro.props;
+
+const siteUrl = import.meta.env.SITE || 'https://tu-dominio.com';
+const currentUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).href;
+const absoluteImage = image.startsWith('http') ? image : new URL(image, siteUrl).href;
+---
+
+<!-- SEO Básico -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={currentUrl} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={currentUrl} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={absoluteImage} />
+<meta property="og:site_name" content="Mi Tienda" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={absoluteImage} />

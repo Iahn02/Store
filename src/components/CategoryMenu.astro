@@ -1,0 +1,106 @@
+---
+// src/components/CategoryMenu.astro
+// Menú lateral de categorías con subcategorías.
+
+import { categories } from '../data/products';
+
+interface Props {
+  activeCategory?: string;
+  activeSubcategory?: string;
+}
+
+const { activeCategory, activeSubcategory } = Astro.props;
+---
+
+<aside class="category-menu">
+  <h3 class="menu-title">Categorías</h3>
+  <ul class="menu-list">
+    {categories.map((cat) => (
+      <li>
+        <a
+          href={`/categorias/${cat.slug}`}
+          class:list={['menu-link', { active: activeCategory === cat.slug && !activeSubcategory }]}
+        >
+          {cat.name}
+        </a>
+        {cat.subcategories && (
+          <ul class="submenu-list">
+            {cat.subcategories.map((sub) => (
+              <li>
+                <a
+                  href={`/categorias/${cat.slug}/${sub.slug}`}
+                  class:list={['submenu-link', { active: activeSubcategory === sub.slug }]}
+                >
+                  {sub.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+</aside>
+
+<style>
+  .category-menu {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .menu-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #999;
+    margin-bottom: 1rem;
+  }
+
+  .menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .menu-link,
+  .submenu-link {
+    display: block;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+  }
+
+  .menu-link:hover,
+  .submenu-link:hover {
+    background: rgba(139, 94, 60, 0.08);
+    color: #8b5e3c;
+  }
+
+  .menu-link.active,
+  .submenu-link.active {
+    background: rgba(139, 94, 60, 0.12);
+    color: #8b5e3c;
+    font-weight: 600;
+  }
+
+  .submenu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 1rem;
+    border-left: 2px solid #f0ede8;
+  }
+
+  .submenu-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+  }
+</style>

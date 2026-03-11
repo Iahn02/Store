@@ -1,0 +1,145 @@
+---
+// src/components/ProductCard.astro
+// Tarjeta de producto reutilizable para todos los listados.
+
+import type { Product } from '../data/products';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+
+const formattedPrice = new Intl.NumberFormat('es-CL', {
+  style: 'currency',
+  currency: product.currency,
+  minimumFractionDigits: 0,
+}).format(product.price);
+
+const categoryLabels: Record<string, string> = {
+  muebles: 'Muebles',
+  joyeria: 'Joyería',
+  decoracion: 'Decoración',
+};
+---
+
+<a href={`/productos/${product.slug}`} class="product-card" id={`product-${product.slug}`}>
+  <div class="card-image">
+    <img
+      src={product.image}
+      alt={product.name}
+      loading="lazy"
+      width="400"
+      height="400"
+    />
+    <span class="card-badge">{categoryLabels[product.category] || product.category}</span>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">{product.name}</h3>
+    <p class="card-description">{product.description.slice(0, 80)}...</p>
+    <div class="card-footer">
+      <span class="card-price">{formattedPrice}</span>
+      <span class="card-cta">Ver detalle →</span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-image {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #f0ede8;
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .product-card:hover .card-image img {
+    transform: scale(1.05);
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(26, 26, 26, 0.75);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+  }
+
+  .card-description {
+    font-size: 0.825rem;
+    color: #777;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .card-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #8b5e3c;
+  }
+
+  .card-cta {
+    font-size: 0.8rem;
+    color: #999;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .product-card:hover .card-cta {
+    color: #8b5e3c;
+  }
+</style>

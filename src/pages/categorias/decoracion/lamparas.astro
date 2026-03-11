@@ -1,0 +1,69 @@
+---
+// src/pages/categorias/decoracion/lamparas.astro
+import Layout from '../../../layouts/Layout.astro';
+import ProductGrid from '../../../components/ProductGrid.astro';
+import CategoryMenu from '../../../components/CategoryMenu.astro';
+import { getProducts } from '../../../data/products';
+
+const products = await getProducts('decoracion', 'lamparas');
+---
+
+<Layout
+  title="Lámparas | Decoración — Mi Tienda"
+  description="Lámparas de diseño para iluminar tu hogar con estilo. Modelos vintage, modernos y artesanales."
+>
+  <main class="container section">
+    <nav class="breadcrumb">
+      <a href="/">Inicio</a> /
+      <a href="/categorias/decoracion">Decoración</a> /
+      <span>Lámparas</span>
+    </nav>
+
+    <h1 class="section-title">Lámparas</h1>
+    <p class="section-subtitle">Iluminación con personalidad para cada rincón de tu hogar.</p>
+
+    <div class="catalog-layout">
+      <CategoryMenu activeCategory="decoracion" activeSubcategory="lamparas" />
+      <div class="catalog-main">
+        <p class="results-count">{products.length} productos</p>
+        <ProductGrid products={products} />
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .breadcrumb {
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #999;
+  }
+
+  .breadcrumb a {
+    color: #8b5e3c;
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .results-count {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .catalog-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
