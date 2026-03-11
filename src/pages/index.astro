@@ -5,14 +5,14 @@ import ProductGrid from '../components/ProductGrid.astro';
 
 // mock categories
 const categories = [
-  { name: 'Sofas', image: '🛋️' },
-  { name: 'Beds', image: '🛏️' },
-  { name: 'Tables', image: '🪑' },
-  { name: 'Storage', image: '📦' },
-  { name: 'Kitchen', image: '🍳' },
-  { name: 'Decor', image: '🖼️' },
-  { name: 'Lighting', image: '💡' },
-  { name: 'Textiles', image: '🧵' },
+  { name: 'Sofás', image: '🛋️', slug: 'sofas' },
+  { name: 'Camas', image: '🛏️', slug: 'camas' },
+  { name: 'Mesas', image: '🪑', slug: 'mesas' },
+  { name: 'Organización', image: '📦', slug: 'organizacion' },
+  { name: 'Cocina', image: '🍳', slug: 'cocina' },
+  { name: 'Decoración', image: '🖼️', slug: 'decoracion' },
+  { name: 'Iluminación', image: '💡', slug: 'iluminacion' },
+  { name: 'Textiles', image: '🧵', slug: 'textiles' },
 ];
 ---
 
@@ -22,7 +22,7 @@ const categories = [
   <section class="categories-section container">
     <div class="category-scroll">
       {categories.map(cat => (
-        <a href="#" class="category-item">
+        <a href={`/categorias/${cat.slug}`} class="category-item">
           <div class="category-icon">{cat.image}</div>
           <span class="category-name">{cat.name}</span>
         </a>
@@ -35,13 +35,13 @@ const categories = [
   <!-- Promo banner like Casa Ideas / Ikea often uses -->
   <section class="promo-banner container">
     <div class="promo-content">
-      <h2>Join NORDY Family</h2>
-      <p>Get exclusive discounts, early access to new collections, and inspiring home styling ideas.</p>
-      <button class="btn btn-primary" aria-label="Join family">Join for free</button>
+      <h2>Únete a la familia NORDY</h2>
+      <p>Obtén descuentos exclusivos, acceso anticipado a nuevas colecciones e ideas inspiradoras para tu hogar.</p>
+      <button class="btn btn-primary" aria-label="Unirse gratis">Unirse gratis</button>
     </div>
   </section>
   
-  <ProductGrid title="Just Arrived" subtitle="Fresh new designs to inspire you." />
+  <ProductGrid title="Recién Llegados" subtitle="Nuevos diseños frescos para inspirarte." />
 </Layout>
 
 <style>

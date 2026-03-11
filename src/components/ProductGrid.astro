@@ -1,75 +1,28 @@
 ---
 import ProductCard from './ProductCard.astro';
-
-// mock data for our catalog
-const products = [
-  {
-    id: '1',
-    title: 'NORDMYRA',
-    category: 'Chair, white/birch',
-    price: 49.99,
-    image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    isNew: true
-  },
-  {
-    id: '2',
-    title: 'LOHALS',
-    category: 'Rug, flatwoven',
-    price: 129.99,
-    image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '3',
-    title: 'HEMNES',
-    category: 'Coffee table, black-brown',
-    price: 149.00,
-    image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '4',
-    title: 'TRÅDFRI',
-    category: 'LED bulb E26 800 lumen',
-    price: 19.99,
-    image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e9d15?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    isNew: true
-  },
-  {
-    id: '5',
-    title: 'KALLAX',
-    category: 'Shelving unit, white',
-    price: 89.99,
-    image: 'https://images.unsplash.com/photo-1595514535315-2244bd999e07?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '6',
-    title: 'RANARP',
-    category: 'Work lamp, black',
-    price: 39.99,
-    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '7',
-    title: 'PELLO',
-    category: 'Armchair, Holmby natural',
-    price: 59.99,
-    image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '8',
-    title: 'FEJKA',
-    category: 'Artificial potted plant',
-    price: 12.99,
-    image: 'https://images.unsplash.com/photo-1520699049698-acd2fcc0f64c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    isNew: true
-  }
-];
+import { getProducts, Product } from '../data/products';
 
 export interface Props {
   title?: string;
   subtitle?: string;
+  limit?: number;
+  products?: Product[];
 }
 
-const { title = "Trending Now", subtitle = "Hand-picked pieces to elevate your space." } = Astro.props;
+const { 
+  title = "Tendencias", 
+  subtitle = "Piezas seleccionadas para elevar tu espacio.", 
+  limit = 8,
+  products: _propsProducts
+} = Astro.props;
+
+// Use provided products or fetch all and slice
+let displayProducts = _propsProducts;
+if (!displayProducts) {
+  const allProducts = await getProducts();
+  displayProducts = allProducts.slice(0, limit);
+}
+
 ---
 
 <section class="product-grid-section container">
@@ -78,17 +31,18 @@ const { title = "Trending Now", subtitle = "Hand-picked pieces to elevate your s
       <h2 class="section-title">{title}</h2>
       <p class="section-subtitle">{subtitle}</p>
     </div>
-    <a href="#" class="view-all-link">
-      See all products
+    <a href="/categorias" class="view-all-link">
+      Ver todos los productos
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </a>
   </div>
 
   <div class="grid">
-    {products.map((product) => (
+    {displayProducts.map((product) => (
       <ProductCard 
         id={product.id}
-        title={product.title}
+        slug={product.slug}
+        title={product.name}
         category={product.category}
         price={product.price}
         image={product.image}
@@ -115,6 +69,7 @@ const { title = "Trending Now", subtitle = "Hand-picked pieces to elevate your s
     font-size: 2.2rem;
     color: var(--color-primary);
     margin-bottom: 0.5rem;
+    letter-spacing: -1px;
   }
 
   .section-subtitle {
@@ -130,6 +85,7 @@ const { title = "Trending Now", subtitle = "Hand-picked pieces to elevate your s
     color: var(--color-primary);
     font-size: 1rem;
     transition: gap var(--transition-fast);
+    text-decoration: none;
   }
 
   .view-all-link:hover {

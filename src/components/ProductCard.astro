@@ -1,6 +1,7 @@
 ---
 export interface Props {
   id: string;
+  slug: string;
   title: string;
   category: string;
   price: number;
@@ -8,20 +9,20 @@ export interface Props {
   isNew?: boolean;
 }
 
-const { title, category, price, image, isNew = false } = Astro.props;
+const { slug, title, category, price, image, isNew = false } = Astro.props;
 
 // format price
-const formattedPrice = new Intl.NumberFormat('en-US', {
+const formattedPrice = new Intl.NumberFormat('es-CL', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'CLP',
   minimumFractionDigits: 0
 }).format(price);
 ---
 
-<article class="product-card group">
+<a href={`/productos/${slug}`} class="product-card group">
   <!-- Image Wrapper -->
   <div class="image-wrapper">
-    {isNew && <span class="badge new-badge">New</span>}
+    {isNew && <span class="badge new-badge">Nuevo</span>}
     <img 
       src={image} 
       alt={title} 
@@ -30,9 +31,9 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
     />
     
     <!-- Quick Add Button Overlay -->
-    <button class="quick-add-btn" aria-label="Add to cart">
+    <button class="quick-add-btn" aria-label="Añadir al carrito">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="cart-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-      <span>Add</span>
+      <span>Añadir</span>
     </button>
   </div>
 
@@ -40,7 +41,7 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
   <div class="product-info">
     <div class="product-header">
       <h3 class="product-title">{title}</h3>
-      <button class="favorite-btn" aria-label="Add to favorites">
+      <button class="favorite-btn" aria-label="Añadir a favoritos">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       </button>
     </div>
@@ -50,7 +51,7 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
       {formattedPrice}
     </div>
   </div>
-</article>
+</a>
 
 <style>
   .product-card {
@@ -59,6 +60,8 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
     gap: 1rem;
     position: relative;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
   }
 
   .image-wrapper {
@@ -111,6 +114,8 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
     font-weight: 600;
     transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 10;
+    border: none;
+    cursor: pointer;
   }
 
   .product-card:hover .quick-add-btn {
@@ -143,7 +148,8 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
 
   .favorite-btn {
     color: var(--color-text-light);
-    background: white;
+    background: transparent;
+    border: none;
     width: 32px;
     height: 32px;
     display: flex;
@@ -151,21 +157,22 @@ const formattedPrice = new Intl.NumberFormat('en-US', {
     justify-content: center;
     border-radius: 50%;
     transition: all var(--transition-fast);
-    box-shadow: var(--shadow-sm);
+    cursor: pointer;
   }
 
   .favorite-btn:hover {
-    color: var(--color-primary);
+    color: #e53e3e; /* Red color for heart */
     transform: scale(1.1);
   }
 
   .favorite-btn:active svg {
-    fill: var(--color-primary);
+    fill: #e53e3e;
   }
 
   .product-category {
     font-size: 0.9rem;
     color: var(--color-text-light);
+    margin: 0;
   }
 
   .product-price {

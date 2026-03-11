@@ -1,0 +1,202 @@
+---
+// src/pages/categorias/[slug].astro
+import Layout from '../../layouts/Layout.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import CategoryMenu from '../../components/CategoryMenu.astro';
+import { getCategoryBySlug, getProducts, categories } from '../../data/products';
+
+// Export getStaticPaths to pre-render the paths (in case SSR is off)
+export async function getStaticPaths() {
+  return categories.map((cat) => ({
+    params: { slug: cat.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const category = getCategoryBySlug(slug!);
+const products = await getProducts(slug!);
+
+if (!category) {
+  return new Response(null, { status: 404, statusText: 'Categoría no encontrada' });
+}
+---
+
+<Layout
+  title={`${category.name} | NORDY.`}
+  description={category.description}
+>
+  <main class="container section">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Inicio</a>
+      <span class="sep">/</span>
+      <a href="/categorias">Categorías</a>
+      <span class="sep">/</span>
+      <span class="current">{category.name}</span>
+    </nav>
+    
+    <div class="category-header">
+      <h1 class="section-title">{category.icon} {category.name}</h1>
+      <p class="section-subtitle">{category.description}</p>
+    </div>
+
+    <div class="catalog-layout">
+      <div class="sidebar">
+        <CategoryMenu activeCategory={slug} />
+      </div>
+      <div class="catalog-main">
+        <p class="results-count">Mostrando {products.length} productos</p>
+        
+        {products.length > 0 ? (
+          <div class="grid">
+            {products.map((p) => (
+              <a href={`/productos/${p.slug}`} class="product-card">
+                <div class="image-wrapper">
+                  {p.isNew && <span class="badge new-badge">Nuevo</span>}
+                  <img src={p.image} alt={p.name} loading="lazy" />
+                </div>
+                <div class="info">
+                  <span class="product-category">{p.category}</span>
+                  <h3 class="product-title">{p.name}</h3>
+                  <p class="product-price">${p.price.toLocaleString('es-CL')}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>No hay productos en esta categoría todavía.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .section {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    margin-bottom: 2rem;
+  }
+  .breadcrumb a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  .breadcrumb .sep {
+    color: var(--color-border);
+  }
+  .breadcrumb .current {
+    font-weight: 600;
+  }
+  .category-header {
+    margin-bottom: 3rem;
+  }
+  .section-title {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+  }
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+  }
+  
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .results-count {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2.5rem 1.5rem;
+  }
+  
+  .product-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    group: hover;
+  }
+  .image-wrapper {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-surface);
+    aspect-ratio: 4/5;
+  }
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+  }
+  .product-card:hover .image-wrapper img {
+    transform: scale(1.03);
+  }
+  .new-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .product-category {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+  }
+  .product-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0.2rem 0;
+  }
+  .product-price {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+  }
+  
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-light);
+  }
+
+  @media (max-width: 768px) {
+    .catalog-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+</style>
