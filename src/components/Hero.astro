@@ -1,0 +1,117 @@
+---
+---
+
+<section class="hero container">
+  <div class="hero-content">
+    <div class="hero-text-box">
+      <span class="badge">New Collection</span>
+      <h1 class="hero-title">Bring nature closer to your home.</h1>
+      <p class="hero-subtitle">
+        Discover our new spring collection designed to create a calm, warm, and inviting atmosphere in every room.
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn btn-primary" aria-label="Shop now">Shop the collection</a>
+        <a href="#" class="btn btn-outline" aria-label="Explore ideas">Explore ideas</a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="hero-image-wrapper">
+    <img 
+      src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+      alt="Modern living room with green sofa and natural light" 
+      class="hero-image"
+      loading="eager"
+    />
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .hero-content {
+    flex: 1;
+    max-width: 500px;
+  }
+
+  .badge {
+    display: inline-block;
+    background-color: var(--color-surface);
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-full);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -1.5px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .hero-image-wrapper {
+    flex: 1.2;
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 4/3;
+    transition: transform 0.5s ease;
+  }
+
+  .hero-image-wrapper:hover .hero-image {
+    transform: scale(1.02);
+  }
+
+  @media (max-width: 992px) {
+    .hero {
+      flex-direction: column;
+      gap: 2rem;
+      padding-top: 2rem;
+    }
+    .hero-content {
+      max-width: 100%;
+    }
+    .hero-title {
+      font-size: 2.8rem;
+    }
+    .hero-image-wrapper {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .hero-title { font-size: 2.2rem; }
+    .hero-actions { flex-direction: column; }
+    .btn { width: 100%; }
+  }
+</style>

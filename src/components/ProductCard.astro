@@ -1,145 +1,177 @@
 ---
-// src/components/ProductCard.astro
-// Tarjeta de producto reutilizable para todos los listados.
-
-import type { Product } from '../data/products';
-
-interface Props {
-  product: Product;
+export interface Props {
+  id: string;
+  title: string;
+  category: string;
+  price: number;
+  image: string;
+  isNew?: boolean;
 }
 
-const { product } = Astro.props;
+const { title, category, price, image, isNew = false } = Astro.props;
 
-const formattedPrice = new Intl.NumberFormat('es-CL', {
+// format price
+const formattedPrice = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: product.currency,
-  minimumFractionDigits: 0,
-}).format(product.price);
-
-const categoryLabels: Record<string, string> = {
-  muebles: 'Muebles',
-  joyeria: 'Joyería',
-  decoracion: 'Decoración',
-};
+  currency: 'USD',
+  minimumFractionDigits: 0
+}).format(price);
 ---
 
-<a href={`/productos/${product.slug}`} class="product-card" id={`product-${product.slug}`}>
-  <div class="card-image">
-    <img
-      src={product.image}
-      alt={product.name}
-      loading="lazy"
-      width="400"
-      height="400"
+<article class="product-card group">
+  <!-- Image Wrapper -->
+  <div class="image-wrapper">
+    {isNew && <span class="badge new-badge">New</span>}
+    <img 
+      src={image} 
+      alt={title} 
+      loading="lazy" 
+      class="product-image"
     />
-    <span class="card-badge">{categoryLabels[product.category] || product.category}</span>
+    
+    <!-- Quick Add Button Overlay -->
+    <button class="quick-add-btn" aria-label="Add to cart">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="cart-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+      <span>Add</span>
+    </button>
   </div>
-  <div class="card-body">
-    <h3 class="card-title">{product.name}</h3>
-    <p class="card-description">{product.description.slice(0, 80)}...</p>
-    <div class="card-footer">
-      <span class="card-price">{formattedPrice}</span>
-      <span class="card-cta">Ver detalle →</span>
+
+  <!-- Content -->
+  <div class="product-info">
+    <div class="product-header">
+      <h3 class="product-title">{title}</h3>
+      <button class="favorite-btn" aria-label="Add to favorites">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </button>
+    </div>
+    
+    <p class="product-category">{category}</p>
+    <div class="product-price">
+      {formattedPrice}
     </div>
   </div>
-</a>
+</article>
 
 <style>
   .product-card {
     display: flex;
     flex-direction: column;
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-
-  .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-  }
-
-  .card-image {
+    gap: 1rem;
     position: relative;
+    cursor: pointer;
+  }
+
+  .image-wrapper {
+    position: relative;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
     aspect-ratio: 1;
     overflow: hidden;
-    background: #f0ede8;
   }
 
-  .card-image img {
+  .product-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
+    transition: transform 0.6s ease;
   }
 
-  .product-card:hover .card-image img {
+  .product-card:hover .product-image {
     transform: scale(1.05);
   }
 
-  .card-badge {
+  .new-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(26, 26, 26, 0.75);
-    backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 600;
+    top: 1rem;
+    left: 1rem;
+    background-color: #12805c; /* green highlight */
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 10;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.3rem 0.7rem;
-    border-radius: 20px;
   }
 
-  .card-body {
-    padding: 1.25rem;
+  /* Quick Add overlay button */
+  .quick-add-btn {
+    position: absolute;
+    bottom: -3rem; /* Hide initially */
+    left: 1rem;
+    right: 1rem;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.8rem;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+  }
+
+  .product-card:hover .quick-add-btn {
+    bottom: 1rem; /* Show on hover */
+  }
+
+  .quick-add-btn:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+  }
+
+  /* Info styling */
+  .product-info {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    flex: 1;
+    gap: 0.25rem;
   }
 
-  .card-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    line-height: 1.3;
-  }
-
-  .card-description {
-    font-size: 0.825rem;
-    color: #777;
-    line-height: 1.5;
-    flex: 1;
-  }
-
-  .card-footer {
+  .product-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid #f0f0f0;
+    align-items: flex-start;
   }
 
-  .card-price {
+  .product-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #8b5e3c;
+    color: var(--color-text);
   }
 
-  .card-cta {
-    font-size: 0.8rem;
-    color: #999;
-    font-weight: 500;
-    transition: color 0.2s;
+  .favorite-btn {
+    color: var(--color-text-light);
+    background: white;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
   }
 
-  .product-card:hover .card-cta {
-    color: #8b5e3c;
+  .favorite-btn:hover {
+    color: var(--color-primary);
+    transform: scale(1.1);
+  }
+
+  .favorite-btn:active svg {
+    fill: var(--color-primary);
+  }
+
+  .product-category {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+  }
+
+  .product-price {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-top: 0.3rem;
+    color: var(--color-primary);
   }
 </style>
