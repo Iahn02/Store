@@ -1,81 +1,43 @@
 ---
 // src/pages/productos/[slug].astro
-// Ruta dinámica SSR — Detalle de producto individual.
-// Se renderiza en el servidor en cada request.
-
 import Layout from '../../layouts/Layout.astro';
-import { getProductBySlug } from '../../data/products';
+import { getProductBySlug, getAllProducts } from '../../data/products';
 
-// 1. Obtener el slug desde la URL
-const { slug } = Astro.params;
-
-// 2. Buscar el producto
-const product = await getProductBySlug(slug!);
-
-// 3. 404 si no existe
-if (!product) {
-  return new Response(null, {
-    status: 404,
-    statusText: 'Producto no encontrado',
-  });
+export async function getStaticPaths() {
+  const products = await getAllProducts();
+  return products.map((p) => ({
+    params: { slug: p.slug },
+  }));
 }
 
-// 4. Formatear precio
+const { slug } = Astro.params;
+const product = await getProductBySlug(slug!);
+
+if (!product) {
+  return new Response(null, { status: 404, statusText: 'Producto no encontrado' });
+}
+
+// Formatear precio
 const formattedPrice = new Intl.NumberFormat('es-CL', {
   style: 'currency',
   currency: product.currency,
   minimumFractionDigits: 0,
 }).format(product.price);
 
-// 5. Labels legibles
-const categoryLabels: Record<string, string> = {
-  muebles: 'Muebles',
-  joyeria: 'Joyería',
-  decoracion: 'Decoración',
-};
-const subcategoryLabels: Record<string, string> = {
-  lamparas: 'Lámparas',
-  espejos: 'Espejos',
-};
-
-// 6. JSON-LD para SEO (datos estructurados Schema.org)
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Product',
-  name: product.name,
-  description: product.description,
-  image: product.image,
-  offers: {
-    '@type': 'Offer',
-    price: product.price,
-    priceCurrency: product.currency,
-    availability: 'https://schema.org/InStock',
-  },
-};
 ---
 
 <Layout
-  title={`${product.name} | Mi Tienda`}
+  title={`${product.name} | NORDY.`}
   description={product.description}
-  image={product.image}
-  type="product"
 >
   <main class="product-detail container">
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
       <a href="/">Inicio</a>
       <span class="sep">/</span>
-      <a href={`/categorias/${product.category}`}>
-        {categoryLabels[product.category]}
+      <a href={`/categorias/${product.categorySlug}`}>
+        {product.category}
       </a>
-      {product.subcategory && (
-        <>
-          <span class="sep">/</span>
-          <a href={`/categorias/${product.category}/${product.subcategory}`}>
-            {subcategoryLabels[product.subcategory]}
-          </a>
-        </>
-      )}
       <span class="sep">/</span>
       <span class="current">{product.name}</span>
     </nav>
@@ -84,6 +46,7 @@ const jsonLd = {
     <div class="product-container">
       <div class="product-gallery">
         <div class="gallery-main">
+          {product.isNew && <span class="badge new-badge">Nuevo</span>}
           <img
             src={product.image}
             alt={product.name}
@@ -95,8 +58,7 @@ const jsonLd = {
 
       <div class="product-info">
         <span class="product-category">
-          {categoryLabels[product.category]}
-          {product.subcategory && ` · ${subcategoryLabels[product.subcategory]}`}
+          {product.category}
         </span>
 
         <h1 id="product-title">{product.name}</h1>
@@ -104,7 +66,7 @@ const jsonLd = {
         <p class="product-description">{product.description}</p>
 
         <div class="product-features">
-          <h3>Características</h3>
+          <h3>Características principales</h3>
           <ul>
             {product.features.map((feature) => (
               <li>
@@ -116,28 +78,73 @@ const jsonLd = {
         </div>
 
         <div class="product-actions">
-          <button class="btn-primary" id="add-to-cart">
-            Agregar al carrito
+          <button class="btn btn-primary btn-add-cart" id="add-to-cart" data-id={product.id} data-name={product.name} data-price={product.price} data-image={product.image}>
+            Añadir a la bolsa
           </button>
-          <button class="btn-whatsapp" id="contact-whatsapp">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
-            Consultar por WhatsApp
-          </button>
+        </div>
+        
+        <div class="delivery-info">
+          <div class="info-row">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            <span>Despacho a domicilio disponible.</span>
+          </div>
+          <div class="info-row">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            <span>Retiro en tienda disponible.</span>
+          </div>
         </div>
       </div>
     </div>
   </main>
-
-  <!-- JSON-LD para SEO -->
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </Layout>
+
+<script>
+  // Simple Cart Logic using localStorage
+  const addToCartBtn = document.getElementById('add-to-cart');
+  
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', () => {
+      const product = {
+        id: addToCartBtn.getAttribute('data-id'),
+        name: addToCartBtn.getAttribute('data-name'),
+        price: Number(addToCartBtn.getAttribute('data-price')),
+        image: addToCartBtn.getAttribute('data-image'),
+        quantity: 1
+      };
+      
+      let cart = JSON.parse(localStorage.getItem('nordy_cart') || '[]');
+      
+      const existingProductIndex = cart.findIndex((p: any) => p.id === product.id);
+      if (existingProductIndex >= 0) {
+        cart[existingProductIndex].quantity += 1;
+      } else {
+        cart.push(product);
+      }
+      
+      localStorage.setItem('nordy_cart', JSON.stringify(cart));
+      
+      // Update badge
+      const badge = document.querySelector('.cart-badge');
+      if (badge) {
+        const totalItems = cart.reduce((acc: number, item: any) => acc + item.quantity, 0);
+        badge.textContent = totalItems.toString();
+        badge.classList.add('bump');
+        setTimeout(() => badge.classList.remove('bump'), 300);
+      }
+      
+      // visual feedback
+      addToCartBtn.textContent = '¡Añadido!';
+      setTimeout(() => {
+        addToCartBtn.textContent = 'Añadir a la bolsa';
+      }, 2000);
+    });
+  }
+</script>
 
 <style>
   .product-detail {
     padding-top: 2rem;
-    padding-bottom: 4rem;
+    padding-bottom: 5rem;
   }
 
   /* ── Breadcrumb ── */
@@ -146,187 +153,165 @@ const jsonLd = {
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--color-text-light);
     margin-bottom: 2.5rem;
     flex-wrap: wrap;
   }
 
   .breadcrumb a {
-    color: #8b5e3c;
+    color: var(--color-primary);
+    text-decoration: none;
     transition: opacity 0.2s;
   }
 
   .breadcrumb a:hover {
-    opacity: 0.7;
+    text-decoration: underline;
   }
 
   .breadcrumb .sep {
-    color: #ddd;
+    color: var(--color-border);
   }
 
   .breadcrumb .current {
-    color: #555;
     font-weight: 500;
   }
 
   /* ── Grid producto ── */
   .product-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 5rem;
     align-items: start;
   }
 
   /* ── Galería ── */
   .gallery-main {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    background: #f0ede8;
+    background: var(--color-surface);
+    position: relative;
+    aspect-ratio: 4/5;
   }
 
   .gallery-main img {
     width: 100%;
-    aspect-ratio: 1;
+    height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
   }
-
-  .gallery-main:hover img {
-    transform: scale(1.03);
+  
+  .new-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    z-index: 2;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
   }
 
   /* ── Info producto ── */
   .product-category {
-    display: inline-block;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #8b5e3c;
-    background: rgba(139, 94, 60, 0.08);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
+    letter-spacing: 1px;
+    color: var(--color-text-light);
     margin-bottom: 1rem;
+    display: block;
   }
 
   h1 {
-    font-size: 2.25rem;
+    font-size: 3rem;
     font-weight: 700;
-    line-height: 1.2;
-    color: #1a1a1a;
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -1.5px;
   }
 
   .product-price {
-    font-size: 1.75rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #8b5e3c;
-    margin-bottom: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
   }
 
   .product-description {
-    font-size: 1rem;
-    color: #666;
-    line-height: 1.8;
-    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
   }
 
   /* ── Features ── */
   .product-features h3 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #999;
-    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
   }
 
   .product-features ul {
     list-style: none;
     padding: 0;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
 
   .product-features li {
-    padding: 0.65rem 0;
-    border-bottom: 1px solid #f0f0f0;
-    color: #444;
-    font-size: 0.95rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-light);
+    font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
   }
 
   .check {
-    color: #8b5e3c;
+    color: var(--color-primary);
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   /* ── Actions ── */
-  .product-actions {
+  .btn-add-cart {
+    width: 100%;
+    padding: 1.2rem;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  /* ── Delivery Info ── */
+  .delivery-info {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
-    flex-wrap: wrap;
+    padding: 1.5rem;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
   }
-
-  .btn-primary {
-    flex: 1;
-    min-width: 180px;
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s ease;
-  }
-
-  .btn-primary:hover {
-    background: #8b5e3c;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(139, 94, 60, 0.25);
-  }
-
-  .btn-whatsapp {
-    display: inline-flex;
+  
+  .info-row {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: transparent;
-    color: #25d366;
-    border: 2px solid #25d366;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
+    gap: 1rem;
+    color: var(--color-primary);
+    font-weight: 500;
     font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-whatsapp:hover {
-    background: #25d366;
-    color: #fff;
   }
 
   /* ── Responsive ── */
-  @media (max-width: 768px) {
+  @media (max-width: 992px) {
     .product-container {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 3rem;
     }
-
-    h1 {
-      font-size: 1.75rem;
-    }
-
-    .product-price {
-      font-size: 1.5rem;
-    }
-
-    .product-actions {
-      flex-direction: column;
-    }
+    h1 { font-size: 2.5rem; }
   }
 </style>
